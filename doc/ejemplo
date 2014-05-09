@@ -1,0 +1,22 @@
+#interval 1s
+#dimensions 2
+#plane (x,y)
+#angle deg
+
+move (1,0);
+turn 90;
+move (1,0);
+turn 90;
+move (1,0);
+turn 90;
+move (1,0);
+turn 90;
+
+//-------------------------------
+
+int i = 4;
+while(i > 0) {
+    move (1,0);
+    turn 90;
+    i = i - 1;
+}

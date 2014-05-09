@@ -1,0 +1,33 @@
+PREPROCESADO << excluido
+
+#angle [deg|rad|grad]
+#interval \d+[ms|s]
+#dimensions [1|2|3]
+#plane [(x,y)|<x,z)] <si dimensions == 2, por defecto (x,y)>
+
+TIPOS
+
+bool (1)
+int (32)
+float (64)
+vector1d (64) <<
+vector2d (128) <<
+vector3d (192)
+
+CONTROL DE FLUJO
+
+if
+else
+while
+
+INSTRUCCIONES DE MOVIMIENTO
+
+move <vector3d>
+turn <float>
+pitch <float>
+yaw <float>
+accelerate <float>
+decelerate <float>
+stop
+
+ESTRUCTURA DE AGRUPAMIENTO <<
