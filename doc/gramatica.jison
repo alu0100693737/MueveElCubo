@@ -3,6 +3,15 @@
 %token T_INST0
 %token T_INST1VEC T_INST1FLOAT
 
+%{
+
+/*Inicializando estructuras de datos*/
+
+var hashVariables = {};
+
+
+%}
+
 %lex
 %%
 \s+ 					/* empty */
@@ -43,6 +52,9 @@
 BODY:
   LINE
 | EOF
+	{
+		console.log (hashVariables);
+	}
 | LINE BODY
 ;
     
@@ -80,7 +92,22 @@ DECLARATION:
 
 INT:
   T_TINT T_ID '=' T_INT
-  ;
+	{
+		if ($2 in hashVariables) {
+			console.log ("Variable ya declarada.");
+		} else {
+			hashVariables[$2] = $4;
+		}
+	}
+| T_ID '=' T_INT
+	{
+		if ($2 in hashVariables) {
+			hashVariables[$1] = $3;
+		} else {
+			console.log ("Usando una variable sin declarar.");
+		}
+	}
+;
 FLOAT:
   T_TFLOAT T_ID '=' T_FLOAT
   ;
@@ -90,6 +117,9 @@ VEC:
 
 INSTRUCTION:
   T_INST0
+	{
+		console.log("Parando el movimiento.");
+	}
 | INST1VEC
 | INST1FLOAT
 ;
@@ -100,3 +130,4 @@ INST1VEC:
 INST1FLOAT:
   T_INST1FLOAT T_FLOAT
   ;
+
