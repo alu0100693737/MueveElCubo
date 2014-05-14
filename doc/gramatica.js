@@ -95,7 +95,7 @@ case 18:
 	
 break;
 case 19:
-		if ($$[$0-1] in hashVariables) {
+		if ($$[$0-2] in hashVariables) {
 			hashVariables[$$[$0-2]] = $$[$0];
 		} else {
 			console.log ("Usando una variable sin declarar.");
