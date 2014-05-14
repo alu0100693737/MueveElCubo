@@ -101,7 +101,7 @@ INT:
 	}
 | T_ID '=' T_INT
 	{
-		if ($2 in hashVariables) {
+		if ($1 in hashVariables) {
 			hashVariables[$1] = $3;
 		} else {
 			console.log ("Usando una variable sin declarar.");
