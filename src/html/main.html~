@@ -7,16 +7,20 @@
 		<script src="../js/jquery-2.1.1.min.js" type="text/javascript"></script>
 		<script src="../js/three.min.js" type="text/javascript"></script>
 		<script src="../js/main.js" type="text/javascript"></script>
+		<link rel="shortcut icon" href="../css/Home.ico" type="image/x-icon">
+		
 	</head>
 	<body>
-		<div id="context">
-		</div>
+		
+		<address><h1>Proyecto DSL. Mueve el Cubo</address>
 		<div id ="control">
-			<button name="load" id="loadButton">load</button>
+			<button name="load" id="loadButton">load</button>   
 			<button name="play" id="playButton">play</button>
 		</div>
+		<div id="context"></div>
 		<div id="sourceArea">
-			<textarea id="source" readonly>fuente</textarea>
-		</div>
+			<textarea id="source" readonly>fuente</textarea></div>
+		<address>Creada por Juan Hernandez, Guillermo Rodríguez e Iván García. <br> Procesadores del lenguaje.</address>
+
 	</body>
 </html>

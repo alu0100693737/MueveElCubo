@@ -9,7 +9,7 @@ body {
   font-family: $main-font;
   
 
-background: #A9F5D0 url(/images/1.jpg) no-repeat ;
+background: #A9F5D0 url("./images/1.jpg") no-repeat ;
 background-size: cover;
 background-position: center 0;
 background-attachment: fixed;
@@ -83,7 +83,7 @@ nav a.current {
   
 }
 
-#like {
+#control {
   p {
     font-weight: bold;
     color: $red;
@@ -96,6 +96,7 @@ nav a.current {
   }
   
 }
+
 
 
 .loadfile {
