@@ -11,7 +11,7 @@
    var globalVar = {};
 
    // Array de los diversos hash locales por cada bloque creado
-   // Usar como una pila 
+   // Usar como una pila
    var localHashList = new Array ();
    var localHashIndex = -1;
 
@@ -56,8 +56,6 @@
 "-"					return '-';
 "="					return '=';
 
-
-
 "stop"					return 'T_INST0';
 "move"					return 'T_INST1VEC';
 "turn"|"pitch"|"yaw"|"accel"|"decel"	return 'T_INST1FLOAT';
@@ -69,7 +67,6 @@
 "int"					return 'T_TINT';
 "float"					return 'T_TFLOAT';
 "vec"					return 'T_TVEC';
-
 
 "("					return '(';
 ")"					return ')';
@@ -123,7 +120,7 @@ END_BLOCK: /* empty */
 	      console.log (" +++ Finalizando BLoque " + localHashIndex);
 	      console.log (localHashList[localHashIndex]);
 	      console.log (" ++++++++++++++++++++++++++++++++++++++++++ \n");
-	      localHashList.splice(localHashIndex, 1);
+	      localHashList.splice(localHashIndex, 1); // Eliminar las variables locales de vector  de mapas
 	      localHashIndex = localHashIndex - 1;
 	      ignoreActualBlock = false;
 	   }
@@ -250,12 +247,18 @@ BLOCK_CONT:
 ;
 
 ELSE:
-	  IF T_ELSE BLOCK_CONT
-|	  IF T_ELSE '\n' ADD_LINE BLOCK_CONT
+	  IF INIT_ELSE T_ELSE BLOCK_CONT
+|	  IF INIT_ELSE T_ELSE '\n' ADD_LINE BLOCK_CONT
+;
+
+INIT_ELSE: /* empty */
+	   {
+	      ignoreActualBlock = !ignoreActualBlock;     
+	   }
 ;
 
 WHILE:
-  	T_WHILE '(' COMP ')' '{' BLOCK '}'
+  	T_WHILE '(' COMP ')' BLOCK_CONT
 
 ;
 
