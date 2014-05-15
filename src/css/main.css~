@@ -17,10 +17,12 @@ color: #A9F5D0;
 {
    font: small-caps 120%/200% serif;
    color: #FFFFFF;
-    width: 500px;
+    width: 100px;
    height: 400px;
    resize: none;
 }
+
+
 
 #control
 {
@@ -37,7 +39,7 @@ color: #A9F5D0;
  	resize: none;
 	border-style: solid;
  	border-width: 1px;
-	top: 2100px;
+	top: 360px;
  	left: 650px;
 }
 
@@ -64,4 +66,41 @@ error {
 .centered {
   text-align: center;
 }
+
+#fileinput { 
+  border:2px dotted #A9F5D0; 
+  width:400px; 
+  color:#92AAB0; 
+  text-align:left;
+   position: absolute;
+  top: -60px;
+  padding:10px 10px 10 10px; 
+  margin-bottom:20px; 
+  font-size:150%; } 
+  
+#entrada { 
+  font: oblique 100% sans-serif bold; 
+  
+} 
+
+h1 { 
+  text-align: center; 
+  font-size: 80px; 
+  
+} 
+
+th, td { 
+  vertical-align: top; 
+  text-align: left; 
+  
+} 
+
+#initialinput { 
+  font: small-caps 120%/200% serif; 
+  color: #FFFFFF; 
+  background-color: #29088A; 
+  
+} 
+
+#finaloutput { font: small-caps 80%/200% serif; color: #000000; }
 

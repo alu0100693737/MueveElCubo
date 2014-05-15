@@ -7,8 +7,12 @@
 		<script src="../js/jquery-2.1.1.min.js" type="text/javascript"></script>
 		<script src="../js/three.min.js" type="text/javascript"></script>
 		<script src="../js/main.js" type="text/javascript"></script>
+<<<<<<< HEAD
 		<script src="../interpreter.js" type="text/javascript"></script>
 		<link rel="shortcut icon" href="../css/Home.ico" type="image/x-icon">
+=======
+		<link rel="shortcut icon" href="../css/home.ico" type="image/x-icon">
+>>>>>>> estructura completa, css, draganddrop y favicon ok
 		
 	</head>
 	<body>
@@ -16,11 +20,57 @@
 		<address><h1>Proyecto DSL. Mueve el Cubo</address>
 		<address>Creada por Juan Hernandez, Guillermo Rodríguez e Iván García. <br> Procesadores del lenguaje.</address>
 		<div id ="control">
-			<button name="load" id="loadButton">load</button>   
-			<button name="play" id="playButton">play</button>
+		
+		<!--<input type="file" id="examples" />-->
+		<div id="fileinput" ondrop="handleFileSelect(event)"> Arrastre los archivos aquí</div> 
+		<div id="out" class="hidden"> 
+		<table>  <tr> <td> 
+		<pre class="input" id="initialinput"></pre> 
+		</td> <td> <pre class="output" id="finaloutput"></pre> </td> </tr> </table> </div>
+		
+			<!--<button name="load" id="loadButton">load</button>   
+			<button name="play" id="playButton">play</button>-->
 		</div>
+		
+		<div class="loadfile">
+		<!--AÑADIR A LAS RUTAS CORRESPONDIENTES EL EJEMPLO-->
+		<button id ="example1" type="button" onclick="dump('../examples/example1.txt');">example1</button> 
+		<button id ="example2" type="button" onclick="dump('../examples/example2.txt');">example2</button>
+		<input type="file" id="files"/>
+		</div>
+		<script type="text/javascript">
+		function dump(fileName) {
+		  $.get(fileName, function (data) {
+		    $("#original").val(data);
+		  });
+		};
+
+		document.getElementById('files').addEventListener('change', CopyMe, false);
+
+		function CopyMe(evt) {
+		  var file = evt.target.files[0];
+		    if (file) {
+		      var reader = new FileReader();
+			reader.onload = function(e) { 
+			  original.innerHTML = e.target.result;
+			    }
+			    var c = reader.readAsText(file);
+			}
+		    else { alert("Failed to load file"); }
+		}
+		
+		
+		</script>
+		<script type="text/javascript" src="javascripts/main.js"></script>
+		    </div>
+		  </div>    
+		  <input id="PARSE" value=parse type=button class="mylink">
+
+		  <input id="PLAY" value=play type=button class="mylink">
+		  <pre id=OUTPUT></pre>
+		  
 		<div id="context"></div>
-		<div id="sourceArea">
+		<div id="sourceArea"><!--CREO QUE ESTE CUADRO DE TEXTO NO VA A SERVIR PARA NADA-->
 			<textarea id="source" readonly>fuente</textarea></div>
 		<address>Creada por Juan Hernandez, Guillermo Rodríguez e Iván García. <br> Procesadores del lenguaje.</address>
 
