@@ -5,16 +5,37 @@
 
 %{
 
-/*Inicializando estructuras de datos*/
+   /*Inicializando estructuras de datos*/
 
-// Hash para almacenar el uso de variables globales
-var globalVar = {};
+   // Hash para almacenar el uso de variables globales
+   var globalVar = {};
 
-var localHashIndex = -1;
+   // Array de los diversos hash locales por cada bloque creado
+   // Usar como una pila 
+   var localHashList = new Array ();
+   var localHashIndex = -1;
 
-var localHashList = new Array ();
+   // Variables de control
+   var lineNumberAct = 0;
 
+   // Funciones globales
+   function searchID (text) {
+      var foundVar = false;
+      var i = 0;
+      while (!foundVar && (i < localHashIndex + 1)) {
+         if (text in localHashList[i]) {
+            foundVar = true;
+         } else {
+            ++i;
+         }
+      } 
+      if (!foundVar) {
+         i = -1;
+      }
+      return i;
+   }
 
+   console.log ("Inicializando ejecucion... ------------------------------");
 %}
 
 %lex
@@ -60,6 +81,7 @@ BODY:
 	      /* Ejecuciones finales */
 	      console.log (" +++ Estado final del hash de variables globales +++");
 	      console.log (globalVar);
+	      console.log ("Ejecucion Finalizada. -----------------------------------------");
 	   }
 ;
 
@@ -71,10 +93,9 @@ BLOCK:
 INIT_BLOCK: /* empty */
 	   {
 	      /* Inicializar estructuras de datos para el bloque. */
-	      console.log ("Inicializando un bloque.");
-	
 	      localHashIndex = localHashIndex + 1;
 	      localHashList[localHashIndex] = {};
+	      console.log(" +++ Inicializando Bloque " + localHashIndex + ": ");
 	   }
 ;
 
@@ -85,14 +106,17 @@ MAIN_BLOCK:
 
 END_BLOCK: /* empty */
 	   {
-	      console.log ("Cerrando un bloque.");
-	      console.log ("Inidice pila hash variables: " + localHashIndex);
-	      console.log ("Variables locales: ");
-	      console.log (localHashList[localHashIndex]);
+	      /* Ejecuciones finales de un bloque */
+	      console.log (" +++ Finalizando BLoque " + localHashIndex);
+	      var localVar = localHashList[localHashIndex];
+	      console.log (localVar);
+	      console.log (" ++++++++++++++++++++++++++++++++++++++++++ \n");
 	      localHashList.splice(localHashIndex, 1);
 	      localHashIndex = localHashIndex - 1;
 	   }
 ;
+
+
     
 LINE:
   DECLARATION
@@ -107,13 +131,13 @@ CONTROL:
 ;
 
 IF:
-  T_IF '(' COMP ')' '{' BODY '}'
+  T_IF '(' COMP ')' '{' BLOCK '}'
   ;
 ELSE:
-  IF T_ELSE '{' BODY '}'
+  IF T_ELSE '{' BLOCK '}'
   ;
 WHILE:
-  T_WHILE '(' COMP ')' '{' BODY '}'
+  T_WHILE '(' COMP ')' '{' BLOCK '}'
 	{
 		
 	}
@@ -132,21 +156,22 @@ DECLARATION:
 INT:
   T_TINT T_ID '=' T_INT
 	{
-	        var localVar = localHashList[localHashIndex];
-		if ($2 in localVar) {
-			console.log ("Variable ya declarada.");
-		} else {
-			(localHashList[localHashIndex])[$2] = $4;
-		}
+	   ++lineNumberAct;
+	   if (searchID ($2) > -1) {
+	      console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable previamente declarada");  
+	   } else {
+	      localHashList[localHashIndex][$2] = $4;
+	   }
 	}
 | T_ID '=' T_INT
 	{
-		var localVar = localHashList[localHashIndex];
-		if ($1 in localVar) {
-			(localHashList[localHashIndex])[$1] = $3;
-		} else {
-			console.log ("Usando una variable sin declarar.");
-		}
+	   ++lineNumberAct;
+	   var posID = searchID ($1);
+	   if (posID > -1) {
+	      localHashList[posID][$1] = $3;
+	   } else {
+	      console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable sin declaradar"); 
+	   }
 	}
 ;
 FLOAT:
