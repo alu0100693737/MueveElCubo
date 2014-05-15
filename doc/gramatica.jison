@@ -17,6 +17,7 @@
 
    // Variables de control
    var lineNumberAct = 0;
+   var ignoreActualBlock = false;
 
    // Funciones globales ---
    /*
@@ -45,12 +46,16 @@
 
 %lex
 %%
+
 \s+ 					/* empty */
 \n					return '\n';
+
+"=="|"!="|"<"|">"|"<="|">="		return 'T_COMP';
+
 "+"					return '+';
 "-"					return '-';
 "="					return '=';
-"=="|"!="|"<"|">"|"<="|">="		return 'T_COMP';
+
 
 
 "stop"					return 'T_INST0';
@@ -65,19 +70,22 @@
 "float"					return 'T_TFLOAT';
 "vec"					return 'T_TVEC';
 
-[0-9]+("."[0-9]+)\b			return 'T_FLOAT';
-[0-9]+					return 'T_INT';
-"("[0-9]+("."[0-9]+)\b","[0-9]+("."[0-9]+)\b","[0-9]+("."[0-9]+)\b")"			return 'T_VEC';
 
 "("					return '(';
 ")"					return ')';
 "{"					return '{';
 "}"					return '}';
 
+[0-9]+("."[0-9]+)\b			return 'T_FLOAT';
+[0-9]+\b				return 'T_INT';
+"("[0-9]+("."[0-9]+)\b","[0-9]+("."[0-9]+)\b","[0-9]+("."[0-9]+)\b")"			return 'T_VEC';
 [_a-z][_a-zA-Z0-9]*			return 'T_ID';
 <<EOF>>					return 'EOF';
 
 /lex
+%left '+' '-'
+
+
 %%
 BODY: 	
 	BLOCK EOF
@@ -117,6 +125,7 @@ END_BLOCK: /* empty */
 	      console.log (" ++++++++++++++++++++++++++++++++++++++++++ \n");
 	      localHashList.splice(localHashIndex, 1);
 	      localHashIndex = localHashIndex - 1;
+	      ignoreActualBlock = false;
 	   }
 ;
 
@@ -137,23 +146,36 @@ DECLARATION:
 ;
 
 INT:
-	T_TINT T_ID '=' T_INT
+	ADD_LINE T_TINT T_ID '=' OPERATION_INT
 	   {
-	      ++lineNumberAct;
-	      if (searchID ($2) > -1) {
+	      if (searchID ($3) > -1) {
 	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable previamente declarada");  
 	      } else {
-	         localHashList[localHashIndex][$2] = $4;
+	         if (!ignoreActualBlock ) {
+	            localHashList[localHashIndex][$3] = $5;
+	         }
+	      }
+	      
+	   }
+| 	ADD_LINE T_TINT T_ID
+	   {
+	      if (searchID ($3) > -1) {
+	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable previamente declarada");
+	      } else {
+	         if (!ignoreActualBlock ) {
+	            localHashList[localHashIndex][$3] = 0;
+	         }
 	      }
 	   }
-| 	T_ID '=' T_INT
+| 	ADD_LINE T_ID '=' OPERATION_INT
 	   {
-	      ++lineNumberAct;
-	      var posID = searchID ($1);
+	      var posID = searchID ($2);
 	      if (posID > -1) {
-	         localHashList[posID][$1] = $3;
+	         if (!ignoreActualBlock ) {
+	            localHashList[posID][$2] = $4;
+	         }
 	      } else {
-	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable sin declaradar"); 
+	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable sin declaradar");
 	      }
 	   }
 ;
@@ -166,6 +188,36 @@ VEC:
   	T_TVEC T_ID '=' T_VEC
 ;
 
+OPERATION_INT:
+	OPERATION_INT '+' OPERATION_INT
+	   {
+	      $$ = $1 + $3;
+	   }
+|	OPERATION_INT '-' OPERATION_INT
+	   {
+	      $$ = $1 - $3;
+	   }
+|	T_INT
+	   {
+	     $$ = Number(yytext);
+	   }
+;
+
+OPERATION_FLOAT:
+	OPERATION_FLOAT '+' OPERATION_FLOAT
+	   {
+	      $$ = $1 + $3;
+	   }
+|	OPERATION_FLOAT '-' OPERATION_FLOAT
+	   {
+	      $$ = $1 - $3;
+	   }
+|	T_FLOAT
+	   {
+	     $$ = Number(yytext);
+	   }
+;
+
 
   
 CONTROL:
@@ -175,35 +227,61 @@ CONTROL:
 ;
 
 IF:
-  	T_IF '(' COMP ')' '{' BLOCK '}'
+	INIT_IF BLOCK_CONT
+;
+
+INIT_IF:
+	T_IF '(' COMP ')'
+	   {
+	      if (!$3) {
+	         ignoreActualBlock = true;
+	      }
+	   }
+|	T_IF '(' COMP ')' '\n' ADD_LINE
+	      if (!$3) {
+	         ignoreActualBlock = true;
+	      }
+;
+BLOCK_CONT:
+	'{' BLOCK '}'
+|	'{' '\n' ADD_LINE BLOCK  '}'
+|	'{' BLOCK '\n' ADD_LINE '}'
+| 	'{' '\n' ADD_LINE BLOCK '\n' ADD_LINE '}'
 ;
 
 ELSE:
-	  IF T_ELSE '{' BLOCK '}'
+	  IF T_ELSE BLOCK_CONT
+|	  IF T_ELSE '\n' ADD_LINE BLOCK_CONT
 ;
 
 WHILE:
   	T_WHILE '(' COMP ')' '{' BLOCK '}'
-	   {
-	   	
-	   }
+
 ;
 
 COMP:
-  	T_ID T_COMP T_INT
+  	T_ID T_COMP OPERATION_INT
+	   {
+	      var posID = searchID ($1);
+	      var result = false;
+	      if ( posID > -1 ) {
+	         if ( localHashList[posID][$1] == $3 ) {
+	            result = true;
+	         }
+	      } else {
+	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable sin declarar en una comparacion");
+	      } 
+	      $$ = result;
+	   }
 |  	T_ID T_COMP T_ID
 ;
 
 
 
 INSTRUCTION:
-  	T_INST0
-	   {
-	      ++lineNumberAct;
-	      console.log("Parando el movimiento.");
-	   }
-| 	INST1VEC
-| 	INST1FLOAT
+  	ADD_LINE T_INST0
+| 	ADD_LINE INST1VEC
+| 	ADD_LINE INST1FLOAT
 ;
     
 INST1VEC:
@@ -213,3 +291,8 @@ INST1FLOAT:
  	T_INST1FLOAT T_FLOAT
 ;
 
+ADD_LINE: /* empty */
+	   {
+	      ++lineNumberAct;
+	   }
+;
