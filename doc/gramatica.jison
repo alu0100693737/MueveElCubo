@@ -122,7 +122,7 @@ END_BLOCK: /* empty */
 	      console.log (" ++++++++++++++++++++++++++++++++++++++++++ \n");
 	      localHashList.splice(localHashIndex, 1); // Eliminar las variables locales de vector  de mapas
 	      localHashIndex = localHashIndex - 1;
-	      ignoreActualBlock = false;
+	      //ignoreActualBlock = false;
 	   }
 ;
 
@@ -265,11 +265,40 @@ WHILE:
 COMP:
   	T_ID T_COMP OPERATION_INT
 	   {
-	      var posID = searchID ($1);
+	      var posID = searchID($1);
 	      var result = false;
 	      if ( posID > -1 ) {
-	         if ( localHashList[posID][$1] == $3 ) {
-	            result = true;
+	         switch($2) {
+		    case "==":
+		    if ( localHashList[posID][$1] == $3 ) {
+		      result = true;
+		    }
+		    break;
+		    case "!=":
+		    if ( localHashList[posID][$1] != $3 ) {
+		      result = true;
+		    }
+		    break;
+		    case ">":
+		    if ( localHashList[posID][$1] > $3 ) {
+		      result = true;
+		    }
+		    break;
+		    case "<":
+		    if ( localHashList[posID][$1] < $3 ) {
+		      result = true;
+		    }
+		    break;
+		    case ">=":
+		    if ( localHashList[posID][$1] >= $3 ) {
+		      result = true;
+		    }
+		    break;
+		    case "<=":
+		    if ( localHashList[posID][$1] <= $3 ) {
+		      result = true;
+		    }
+		    break;
 	         }
 	      } else {
 	         console.log (" --- ERROR en la linea " + lineNumberAct + ": \n --- --- Variable sin declarar en una comparacion");
